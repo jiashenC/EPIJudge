@@ -2,6 +2,8 @@ import collections
 import copy
 import functools
 
+from collections import deque
+
 from test_framework import generic_test
 from test_framework.test_failure import TestFailure
 from test_framework.test_utils import enable_executor_hook
@@ -12,8 +14,36 @@ Coordinate = collections.namedtuple('Coordinate', ('x', 'y'))
 
 
 def search_maze(maze, s, e):
-    # TODO - you fill in here.
-    return []
+    visited = dict()
+    queue = deque([(None, s)])
+    while len(queue) > 0:
+        pre, cur = queue.popleft()
+        visited[cur] = pre
+        if cur == e:
+            break
+        for n in neighbors(maze, cur):
+            if n not in visited and maze[n.x][n.y] == WHITE:
+                queue.append((cur, n))
+    if e not in visited:
+        return []
+    cur, path = e, []
+    while cur is not None:
+        path.append(cur)
+        cur = visited[cur]
+    return path[::-1]
+
+
+def neighbors(maze, s):
+    nb = []
+    if s.x > 0:
+        nb.append(Coordinate(s.x - 1, s.y))
+    if s.x < len(maze) - 1:
+        nb.append(Coordinate(s.x + 1, s.y))
+    if s.y > 0:
+        nb.append(Coordinate(s.x, s.y - 1))
+    if s.y < len(maze[0]) - 1:
+        nb.append(Coordinate(s.x, s.y + 1))
+    return nb
 
 
 def path_element_is_feasible(maze, prev, cur):
