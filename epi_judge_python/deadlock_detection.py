@@ -3,6 +3,8 @@ import functools
 from test_framework import generic_test
 from test_framework.test_utils import enable_executor_hook
 
+from collections import defaultdict
+
 
 class GraphVertex:
     def __init__(self):
@@ -10,9 +12,23 @@ class GraphVertex:
 
 
 def is_deadlocked(graph):
-    # TODO - you fill in here.
-    return True
+    VISITED, UNSEEN, SEEN = 0, 1, 2
+    status = defaultdict(lambda: UNSEEN)
 
+    def has_cycle(cur):
+        if status[cur] == SEEN:
+            return True
+        if status[cur] == VISITED:
+            return False
+        status[cur] = SEEN
+
+        cycle = False
+        for vertex in cur.edges:
+            cycle |= has_cycle(vertex)
+        status[cur] = VISITED
+        return cycle
+
+    return any(has_cycle(n) for n in graph)
 
 @enable_executor_hook
 def is_deadlocked_wrapper(executor, num_nodes, edges):
