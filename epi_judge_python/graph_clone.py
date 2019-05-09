@@ -11,8 +11,22 @@ class GraphVertex:
 
 
 def clone_graph(graph):
-    # TODO - you fill in here.
-    return GraphVertex(0)
+    visited = dict()
+
+    def dfs(cur):
+        if cur.label in visited:
+            return visited[cur.label]
+
+        clone_cur = GraphVertex(cur.label)
+        visited[cur.label] = clone_cur
+
+        for vertex in cur.edges:
+            clone_vertex = dfs(vertex)
+            if clone_vertex is not None:
+                clone_cur.edges.append(clone_vertex)
+        return clone_cur
+
+    return dfs(graph)
 
 
 def copy_labels(edges):
