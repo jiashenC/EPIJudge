@@ -3,6 +3,8 @@ import functools
 from test_framework import generic_test
 from test_framework.test_utils import enable_executor_hook
 
+from collections import deque
+
 
 class GraphVertex:
     def __init__(self):
@@ -11,7 +13,24 @@ class GraphVertex:
 
 
 def is_any_placement_feasible(graph):
-    # TODO - you fill in here.
+    visited = [set([]), set([])]
+    queue = deque([(0, graph[0])])
+    remaining = set(graph)
+    while len(queue) > 0 or len(remaining) > 0:
+        if len(queue) <= 0 and len(remaining) > 0:
+            vertex = remaining.pop()
+            remaining.add(vertex)
+            queue = deque([(0, vertex)])
+
+        idx, vertex = queue.popleft()
+        if vertex in visited[1 - idx]:
+            return False
+        if vertex in visited[idx]:
+            continue
+        visited[idx].add(vertex)
+        remaining.remove(vertex)
+        for n in vertex.edges:
+            queue.append((1 - idx, n))
     return True
 
 
